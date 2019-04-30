@@ -87,7 +87,7 @@ sub init
     croak("Don't set set a start_url with the Download::GitHub plugin");
   }
 
-  $meta->prop->{start_url} ||= "https://api.github.com/repos/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/releases";
+  $meta->prop->{start_url} ||= "https://api.github.com/repos/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/releases?access_token=$ENV{GITHUB_PAT}";
 
   $meta->apply_plugin('Download',
     prefer  => $self->prefer,
