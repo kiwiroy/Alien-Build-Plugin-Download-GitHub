@@ -24,6 +24,7 @@ use Alien::Build::Plugin::Extract::Negotiate;
    plugin 'Download::GitHub' => (
      github_user => 'Perl5-Alien',
      github_repo => 'dontpanic',
+     token => '...'
    );
  
  };
@@ -43,6 +44,15 @@ The GitHub user or org that owns the repository.  This property is required.
 =head2 github_repo
 
 The GitHub repository name.  This property is required.
+
+=head2 token
+
+A GitHub personal access token (PAT) obtained from L<https://github.com/settings/tokens>.
+This is required to increase rate limit of API from 60 to 5000 per hour. The
+default is the value of the C<GITHUB_PAT> environment variable. No scopes are
+required so ensure all scopes are unset when creating a token. 
+
+See L<https://developer.github.com/v3/#rate-limiting>
 
 =head2 version
 
@@ -75,6 +85,7 @@ GitHub repositories.  This is the default.
 
 has github_user => sub { croak("github_user is required") };
 has github_repo => sub { croak("github_repo is required") };
+has token => $ENV{GITHUB_PAT};
 has version => qr/^v?(.*)$/;
 has prefer => 0;
 
@@ -87,7 +98,7 @@ sub init
     croak("Don't set set a start_url with the Download::GitHub plugin");
   }
 
-  $meta->prop->{start_url} ||= "https://api.github.com/repos/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/releases?access_token=$ENV{GITHUB_PAT}";
+  $meta->prop->{start_url} ||= "https://api.github.com/repos/@{[ $self->github_user ]}/@{[ $self->github_repo ]}/releases?access_token=@{[ $self->token ]}";
 
   $meta->apply_plugin('Download',
     prefer  => $self->prefer,
